@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VulnScanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gray-900 text-gray-200 min-h-screen flex items-center justify-center p-4"
+  >
+    <div class="w-full max-w-xl bg-gray-800 rounded-2xl p-6 shadow-lg">
+      <h1 class="text-2xl font-bold mb-4 text-center">🔍 VulnScanner</h1>
+
+      <form id="scanForm" class="space-y-4">
+        <input
+          id="target"
+          type="text"
+          placeholder="Ingresa un dominio (ej: github.com)"
+          class="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+          required
+        />
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-lg transition"
+        >
+          Escanear
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 text-sm space-y-2 hidden">
+        <h2 class="font-semibold text-lg">📄 Resultados:</h2>
+        <pre
+          id="output"
+          class="bg-gray-700 p-4 rounded-lg overflow-x-auto whitespace-pre-wrap"
+        ></pre>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("scanForm");
+      const output = document.getElementById("output");
+      const results = document.getElementById("results");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const target = document.getElementById("target").value;
+
+        output.textContent = "🔄 Escaneando...";
+        results.classList.remove("hidden");
+
+        try {
+          const res = await fetch("http://localhost:3000/scan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ target }),
+          });
+
+          const data = await res.json();
+          output.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+          output.textContent = "❌ Error al conectar con el servidor.";
+        }
+      });
+    </script>
+  </body>
+</html>
